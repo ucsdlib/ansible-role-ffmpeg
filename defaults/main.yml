@@ -1,0 +1,8 @@
+---
+# defaults file for ucsdlib.ffmpeg
+
+ffmpeg_version: 3.1.3
+ffmpeg_install: /opt
+ffmpeg_webproxy: {}
+#  http_proxy: http://webproxy:3128/'
+# If you use this, rememer to remove the {}

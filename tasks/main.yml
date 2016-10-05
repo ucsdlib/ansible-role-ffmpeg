@@ -1,0 +1,31 @@
+---
+# tasks file for ucsdlib.ffmpeg
+# Install latest stable ffmpeg
+
+- name: Download ffmpeg
+  unarchive:
+    src: http://johnvansickle.com/ffmpeg/releases/ffmpeg-{{ ffmpeg_version }}-64bit-static.tar.xz
+    #remote_src: yes # requires Ansible 2.2
+    copy: no # Remove for Ansible 2.2
+    dest: '{{ ffmpeg_install }}'
+    creates: '{{ ffmpeg_install }}/ffmpeg-{{ ffmpeg_version}}-64bit-static'
+  environment:
+    '{{ ffmpeg_webproxy | default ({}) }}'
+  become: true
+
+- name: Set Default Symlink
+  file:
+    path: /opt/ffmpeg
+    src: ffmpeg-{{ ffmpeg_version }}-64bit-static
+    state: link
+  become: true
+  ignore_errors: '{{ ansible_check_mode }}'
+
+- name: Set Compatibility Symlink
+  file:
+    path: /usr/local/bin/{{ item }}
+    src: /opt/ffmpeg/{{ item }}
+    state: link
+  become: true
+  with_items:
+    - ffmpeg
