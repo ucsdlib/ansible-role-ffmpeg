@@ -1,5 +1,5 @@
 ---
 - hosts: localhost
-  connection: local
+  remote_user: root
   roles:
-    - ansible-role-ffmpeg
+    - { role: 'ansible-role-ffmpeg', ffmpeg_install: '/tmp' }
