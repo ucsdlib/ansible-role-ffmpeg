@@ -35,14 +35,12 @@
     creates: '{{ ffmpeg_install }}/ffmpeg-{{ ffmpeg_actual_version}}-64bit-static'
   environment:
     '{{ ffmpeg_webproxy | default ({}) }}'
-  become: true
 
 - name: Set Default Symlink
   file:
     path: /opt/ffmpeg
     src: ffmpeg-{{ ffmpeg_actual_version }}-64bit-static
     state: link
-  become: true
   ignore_errors: '{{ ansible_check_mode }}'
 
 - name: Set Compatibility Symlink
@@ -51,6 +49,5 @@
     src: /opt/ffmpeg/{{ item }}
     state: link
   ignore_errors: '{{ ansible_check_mode }}'
-  become: true
   with_items:
     - ffmpeg
