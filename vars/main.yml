@@ -1,0 +1,5 @@
+---
+# vars file for ucsdlib.ffmpeg
+
+ffmpeg_temp_directory_default: /tmp
+ffmpeg_homepage: https://johnvansickle.com/ffmpeg/

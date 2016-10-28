@@ -1,0 +1,6 @@
+---
+
+- name: Remove Temporary Directory
+  file:
+    path: '{{ ffmpeg_temp_directory }}'
+    state: absent

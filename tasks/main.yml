@@ -2,13 +2,37 @@
 # tasks file for ucsdlib.ffmpeg
 # Install latest stable ffmpeg
 
+- name: Make Secure, Temporary Directory
+  command: mktemp -d "{{ lookup('env', 'TMPDIR') | default ('/tmp', true )}}/ansible.XXXXXX"
+  register: ffmpeg_mktemp
+  notify: Remove Temporary Directory
+
+- name: Set Temp Directory Name
+  set_fact:
+    ffmpeg_temp_directory: '{{ ffmpeg_mktemp.stdout | default(ffmpeg_temp_directory_default) }}'
+
+- name: Download ffmpeg Index
+  get_url:
+    url: '{{ ffmpeg_homepage }}'
+    dest: '{{ ffmpeg_temp_directory }}'
+
+# Ugly screen scraping hack
+- name: Get Current Version Number
+  command: 'grep release: {{ ffmpeg_temp_directory }}/index.html'
+  register: ffmpeg_get_version
+
+# Uglier screen scraping hack, with --check hack grafted in
+- name: Set Current Version
+  set_fact:
+    ffmpeg_actual_version: '{{ (ffmpeg_version == "release") | ternary( ffmpeg_get_version.stdout|default("unknown")|regex_replace(".*: ",""), ffmpeg_version ) }}'
+
 - name: Download ffmpeg
   unarchive:
-    src: http://johnvansickle.com/ffmpeg/releases/ffmpeg-{{ ffmpeg_version }}-64bit-static.tar.xz
+    src: '{{ ffmpeg_homepage }}/releases/ffmpeg-{{ ffmpeg_actual_version }}-64bit-static.tar.xz'
     #remote_src: yes # requires Ansible 2.2
     copy: no # Remove for Ansible 2.2
     dest: '{{ ffmpeg_install }}'
-    creates: '{{ ffmpeg_install }}/ffmpeg-{{ ffmpeg_version}}-64bit-static'
+    creates: '{{ ffmpeg_install }}/ffmpeg-{{ ffmpeg_actual_version}}-64bit-static'
   environment:
     '{{ ffmpeg_webproxy | default ({}) }}'
   become: true
@@ -16,7 +40,7 @@
 - name: Set Default Symlink
   file:
     path: /opt/ffmpeg
-    src: ffmpeg-{{ ffmpeg_version }}-64bit-static
+    src: ffmpeg-{{ ffmpeg_actual_version }}-64bit-static
     state: link
   become: true
   ignore_errors: '{{ ansible_check_mode }}'
@@ -26,6 +50,7 @@
     path: /usr/local/bin/{{ item }}
     src: /opt/ffmpeg/{{ item }}
     state: link
+  ignore_errors: '{{ ansible_check_mode }}'
   become: true
   with_items:
     - ffmpeg
