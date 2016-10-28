@@ -1,0 +1,31 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# This follows the .travis.yml file.
+# In places where they differ, .travis.yml is canonical
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "ubuntu/precise64"
+  config.vm.synced_folder "..", "/home/vagrant/roles/ansible-role-ffmpeg", type: "rsync"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    #base
+    sudo apt-get update
+
+    #addons
+    sudo apt-get install -y python-pip python-dev
+
+    #install
+    sudo pip install ansible
+    ansible --version
+    cd "/home/vagrant/roles/ansible-role-ffmpeg"
+    printf '[defaults]\nroles_path=..' >ansible.cfg
+
+    #script
+    ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+    ansible-playbook tests/test.yml -i tests/inventory --check
+    ansible-playbook tests/test.yml -i tests/inventory
+    ansible-playbook tests/test.yml -i tests/inventory --check
+    ansible-playbook tests/test.yml -i tests/inventory
+  SHELL
+end
