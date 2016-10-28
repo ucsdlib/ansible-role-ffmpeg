@@ -38,15 +38,20 @@
 
 - name: Set Default Symlink
   file:
-    path: /opt/ffmpeg
+    path: '{{ ffmpeg_install }}/ffmpeg'
     src: ffmpeg-{{ ffmpeg_actual_version }}-64bit-static
     state: link
   ignore_errors: '{{ ansible_check_mode }}'
 
+- name: Ensure Compatibility Directory Exists
+  file:
+    path: '{{ ffmpeg_compatibility }}'
+    state: directory
+
 - name: Set Compatibility Symlink
   file:
-    path: /usr/local/bin/{{ item }}
-    src: /opt/ffmpeg/{{ item }}
+    path: '{{ ffmpeg_compatibility }}/{{ item }}'
+    src: '{{ ffmpeg_install }}/ffmpeg/{{ item }}'
     state: link
   ignore_errors: '{{ ansible_check_mode }}'
   with_items:

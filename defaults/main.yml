@@ -3,6 +3,7 @@
 
 ffmpeg_version: release
 ffmpeg_install: /opt
+ffmpeg_compatibility: /usr/local/bin
 ffmpeg_webproxy: {}
 #  http_proxy: http://webproxy:3128/'
 # If you use this, rememer to remove the {}
