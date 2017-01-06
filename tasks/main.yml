@@ -3,7 +3,7 @@
 # Install latest stable ffmpeg
 
 - name: Make Secure, Temporary Directory
-  command: mktemp -d "{{ lookup('env', 'TMPDIR') | default ('/tmp', true )}}/ansible.XXXXXX"
+  command: mktemp -d "/tmp/ansible.XXXXXX"
   register: ffmpeg_mktemp
   notify: Remove Temporary Directory
 
